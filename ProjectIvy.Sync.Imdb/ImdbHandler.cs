@@ -26,9 +26,7 @@ namespace ProjectIvy.Sync.Imdb
                 var req = new HttpRequestMessage(HttpMethod.Get, imdbUserRatingsUrl.Replace("{userId}", userId));
                 var http = new HttpClient(handler);
 
-                var resp = http.SendAsync(req).Result.Content.ReadAsStringAsync().Result;
-
-                return resp;
+                return await http.SendAsync(req).Result.Content.ReadAsStringAsync();
             }
             catch (Exception)
             {
