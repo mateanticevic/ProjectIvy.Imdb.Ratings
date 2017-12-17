@@ -1,12 +1,10 @@
 ﻿using Microsoft.Extensions.Configuration;
 using ProjectIvy.Sync.Imdb.Model;
-using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System;
+using TinyCsvParser;
 
 namespace ProjectIvy.Sync.Imdb
 {
@@ -33,53 +31,20 @@ namespace ProjectIvy.Sync.Imdb
                 var existingIds = await DbHandler.GetMovieIds(connectionString, user.userId);
                 var imdbRatings = await ImdbHandler.GetRatings(imdbUserRatingsUrl, imdbCookies, user.imdbUsername);
 
-                var lines = new List<string>(imdbRatings.Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries));
-                lines.RemoveAt(0);
+                var csvOptions = new CsvParserOptions(true, ',');
+                var movieMapping = new MovieMapping();
+                var csvParser = new CsvParser<Movie>(csvOptions, movieMapping);
 
-                foreach (var line in lines)
+                var csvReaderOptions = new CsvReaderOptions(new[] {"\n"});
+                var movies = csvParser.ReadFromString(csvReaderOptions, imdbRatings).Where(x => x.IsValid).Select(x => x.Result).ToList();
+
+                var newMovies = movies.Where(x => !existingIds.Contains(x.ImdbId));
+
+                foreach (var newMovie in newMovies)
                 {
-                    var reg = new Regex("\"(?<value>[^\"]*)\"");
-                    var values = new List<string>();
-
-                    foreach (Match item in reg.Matches(line))
-                    {
-                        values.Add(item.Groups["value"].Value);
-                    }
-
-                    var m = new Movie
-                    {
-                        UserId = user.userId,
-                        ImdbId = values[1].Trim()
-                    };
-
-                     var contains = existingIds.Contains(m.ImdbId);
-                    if (contains)
-                        continue;
-
-                    m.Title = values[5];
-                    m.Type = values[6];
-                    m.Directors = values[7];
-                    m.MyRating = Convert.ToInt32(values[8]);
-                    m.Rating = Convert.ToDecimal(values[9], new CultureInfo("en-US"));
-
-                    m.Year = Convert.ToInt16(values[11]);
-                    m.Genres = values[12];
-                    m.Votes = Convert.ToInt32(values[13]);
-
-                    int.TryParse(values[10], out var runtime);
-                    m.Runtime = runtime;
-
-                    var releaseDate = DateTime.Now;
-
-                    if (DateTime.TryParse(values[14], out releaseDate)) m.ReleaseDate = releaseDate;
-
-                    var timestamp = DateTime.Now;
-
-                    if (DateTime.TryParseExact(values[2], "ddd MMM dd hh:mm:ss yyyy", new CultureInfo("en-US"), DateTimeStyles.None, out timestamp)) m.Timestamp = timestamp;
-                    else if (DateTime.TryParseExact(values[2], "ddd MMM  d hh:mm:ss yyyy", new CultureInfo("en-US"), DateTimeStyles.None, out timestamp)) m.Timestamp = timestamp;
-
-                    await DbHandler.InsertMovie(connectionString, m);
-                    Console.WriteLine($"Movie: {m.Title}, User: {m.UserId}");
+                    newMovie.UserId = user.userId;
+                    await DbHandler.InsertMovie(connectionString, newMovie);
+                    Console.WriteLine($"Movie: {newMovie.Title}, User: {newMovie.UserId}");
                 }
             }
         }
