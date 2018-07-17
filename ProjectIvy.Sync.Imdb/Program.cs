@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using NLog;
 using ProjectIvy.Sync.Imdb.Model;
 using System.IO;
 using System.Linq;
@@ -10,10 +11,14 @@ namespace ProjectIvy.Sync.Imdb
 {
     class Program
     {
+        private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
+
         public static IConfigurationRoot Configuration { get; set; }
 
         static async Task Main(string[] args)
         {
+            _logger.Info("Application started");
+
             var builder = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory())
                                                     .AddJsonFile("appsettings.json");
             Configuration = builder.Build();
@@ -23,11 +28,12 @@ namespace ProjectIvy.Sync.Imdb
             var imdbCookies = Configuration.GetSection("ImdbCookies").GetChildren().Select(x => (x.GetValue<string>("Name"), x.GetValue<string>("Value")));
 
             var users = (await DbHandler.GetImdbUsers(connectionString)).ToList();
-            Console.WriteLine($"Found {users.Count} users with an Imdb account");
+            _logger.Info($"Found {users.Count} users with an Imdb account");
 
             foreach (var user in users)
             {
-                Console.WriteLine($"Processing movies for userId: {user.userId}");
+                _logger.Info($"Processing movies for userId: {user.userId}");
+
                 var existingIds = await DbHandler.GetMovieIds(connectionString, user.userId);
                 var imdbRatings = await ImdbHandler.GetRatings(imdbUserRatingsUrl, imdbCookies, user.imdbUsername);
 
@@ -44,9 +50,11 @@ namespace ProjectIvy.Sync.Imdb
                 {
                     newMovie.UserId = user.userId;
                     await DbHandler.InsertMovie(connectionString, newMovie);
-                    Console.WriteLine($"Movie: {newMovie.Title}, User: {newMovie.UserId}");
+                    _logger.Info($"Movie: {newMovie.Title}, User: {newMovie.UserId}");
                 }
             }
+
+            _logger.Info("Application ended");
         }
     }
 }
