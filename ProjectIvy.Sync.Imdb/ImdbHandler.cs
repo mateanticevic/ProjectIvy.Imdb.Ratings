@@ -1,7 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net;
+﻿using System.Collections.Generic;
 using System.Net.Http;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace ProjectIvy.Sync.Imdb
@@ -10,27 +9,28 @@ namespace ProjectIvy.Sync.Imdb
     {
         public static async Task<string> GetRatings(string imdbUserRatingsUrl, IEnumerable<(string Name, string Value)> cookies, string userId)
         {
-            var handler = new HttpClientHandler();
-            try
+            using (var handler = new HttpClientHandler())
             {
-                var cc = new CookieContainer();
+                var cookieContainer = new CookieContainer();
 
                 foreach (var cookie in cookies)
                 {
                     var cookieToAdd = new Cookie(cookie.Name, cookie.Value, "/", ".imdb.com");
-                    cc.Add(cookieToAdd);
+                    cookieContainer.Add(cookieToAdd);
                 }
 
-                handler.CookieContainer = cc;
+                handler.CookieContainer = cookieContainer;
 
-                var req = new HttpRequestMessage(HttpMethod.Get, imdbUserRatingsUrl.Replace("{userId}", userId));
-                var http = new HttpClient(handler);
+                using (var http = new HttpClient(handler))
+                {
+                    var req = new HttpRequestMessage(HttpMethod.Get, imdbUserRatingsUrl.Replace("{userId}", userId));
 
-                return await http.SendAsync(req).Result.Content.ReadAsStringAsync();
-            }
-            catch (Exception)
-            {
-                return null;
+                    var response = await http.SendAsync(req);
+
+                    response.EnsureSuccessStatusCode();
+
+                    return await response.Content.ReadAsStringAsync();
+                }
             }
         }
     }
