@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27004.2010
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectIvy.Sync.Imdb", "ProjectIvy.Sync.Imdb\ProjectIvy.Sync.Imdb.csproj", "{4C0D5609-72E6-4055-B582-2134417489F5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectIvy.Sync.Imdb", "src\ProjectIvy.Sync.Imdb\ProjectIvy.Sync.Imdb.csproj", "{4C0D5609-72E6-4055-B582-2134417489F5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
