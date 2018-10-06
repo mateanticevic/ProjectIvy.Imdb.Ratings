@@ -1,8 +1,8 @@
 ﻿using Dapper;
+using ProjectIvy.Sync.Imdb.Model;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
-using ProjectIvy.Sync.Imdb.Model;
 
 namespace ProjectIvy.Sync.Imdb
 {

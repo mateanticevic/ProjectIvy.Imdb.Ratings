@@ -1,7 +1,7 @@
-﻿using System;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using NLog;
 using ProjectIvy.Sync.Imdb.Model;
+using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -15,7 +15,7 @@ namespace ProjectIvy.Sync.Imdb
 
         public static IConfigurationRoot Configuration { get; set; }
 
-        static async Task Main(string[] args)
+        public static async Task Main(string[] args)
         {
             _logger.Info("Application started");
 
