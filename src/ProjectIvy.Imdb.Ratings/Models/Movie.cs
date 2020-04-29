@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ProjectIvy.Sync.Imdb.Model
+namespace ProjectIvy.Imdb.Ratings.Models
 {
     class Movie
     {

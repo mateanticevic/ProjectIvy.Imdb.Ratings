@@ -1,19 +1,17 @@
-﻿using Microsoft.Extensions.Configuration;
-using NLog;
-using ProjectIvy.Sync.Imdb.Model;
+﻿using NLog;
+using ProjectIvy.Imdb.Ratings.Models;
 using System;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using TinyCsvParser;
 
-namespace ProjectIvy.Sync.Imdb
+namespace ProjectIvy.Imdb.Ratings
 {
     class Program
     {
-        private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
+        private const string ImdbRatingsUrl = "https://www.imdb.com/user/{userId}/ratings/export";
 
-        public static IConfigurationRoot Configuration { get; set; }
+        private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
 
         public static async Task Main(string[] args)
         {
@@ -21,13 +19,7 @@ namespace ProjectIvy.Sync.Imdb
 
             try
             {
-                var builder = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory())
-                    .AddJsonFile("appsettings.json");
-                Configuration = builder.Build();
-
-                string connectionString = Configuration["ConnectionStrings:MainDb"];
-                string imdbUserRatingsUrl = Configuration["ImdbUserRatingsUrl"];
-                var imdbCookies = Configuration.GetSection("ImdbCookies").GetChildren().Select(x => (x.GetValue<string>("Name"), x.GetValue<string>("Value")));
+                string connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING");
 
                 var users = (await DbHandler.GetImdbUsers(connectionString)).ToList();
                 _logger.Info($"Found {users.Count} users with an Imdb account");
@@ -37,7 +29,8 @@ namespace ProjectIvy.Sync.Imdb
                     _logger.Info($"Processing movies for userId: {user.userId}");
 
                     var existingIds = await DbHandler.GetMovieIds(connectionString, user.userId);
-                    var imdbRatings = await ImdbHandler.GetRatings(imdbUserRatingsUrl, imdbCookies, user.imdbUsername);
+                    var imdbCookies = await DbHandler.GetImdbUserSecrets(connectionString, user.userId);
+                    var imdbRatings = await ImdbHandler.GetRatings(ImdbRatingsUrl, imdbCookies, user.imdbUsername);
 
                     var csvOptions = new CsvParserOptions(true, ',');
                     var movieMapping = new MovieMapping();

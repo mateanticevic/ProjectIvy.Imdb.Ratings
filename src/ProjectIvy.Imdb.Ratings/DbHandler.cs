@@ -1,10 +1,10 @@
 ﻿using Dapper;
-using ProjectIvy.Sync.Imdb.Model;
+using ProjectIvy.Imdb.Ratings.Models;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
 
-namespace ProjectIvy.Sync.Imdb
+namespace ProjectIvy.Imdb.Ratings
 {
     static class DbHandler
     {
@@ -15,6 +15,16 @@ namespace ProjectIvy.Sync.Imdb
                 const string sql = @"SELECT Id, ImdbId FROM [User].[User] WHERE ImdbId IS NOT NULL";
 
                 return await connection.QueryAsync<(int, string)>(sql);
+            }
+        }
+
+        public static async Task<IEnumerable<(string Key, string Value)>> GetImdbUserSecrets(string connectionString, int userId)
+        {
+            using (var connection = new SqlConnection(connectionString))
+            {
+                const string sql = @"SELECT [Key], [Value] FROM [User].UserSecret WHERE UserId = @UserId AND UserSecretTypeId = 1";
+
+                return await connection.QueryAsync<(string, string)>(sql, new { userId });
             }
         }
 

@@ -3,7 +3,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace ProjectIvy.Sync.Imdb
+namespace ProjectIvy.Imdb.Ratings
 {
     static class ImdbHandler
     {

@@ -1,6 +1,6 @@
 ﻿using TinyCsvParser.Mapping;
 
-namespace ProjectIvy.Sync.Imdb.Model
+namespace ProjectIvy.Imdb.Ratings.Models
 {
     class MovieMapping : CsvMapping<Movie>
     {
