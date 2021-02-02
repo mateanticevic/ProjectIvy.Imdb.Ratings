@@ -1,5 +1,8 @@
-﻿using NLog;
-using ProjectIvy.Imdb.Ratings.Models;
+﻿using ProjectIvy.Imdb.Ratings.Models;
+using Serilog;
+using Serilog.Events;
+using Serilog.Sinks.Graylog;
+using Serilog.Sinks.Graylog.Core.Transport;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -11,29 +14,44 @@ namespace ProjectIvy.Imdb.Ratings
     {
         private const string ImdbRatingsUrl = "https://www.imdb.com/user/{userId}/ratings/export";
 
-        private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
+        private static ILogger _logger;
 
         public static async Task Main(string[] args)
         {
-            LogInfo("Application started");
+            Log.Logger = new LoggerConfiguration().MinimumLevel.Debug()
+                                                  .MinimumLevel.Override(nameof(Microsoft), LogEventLevel.Information)
+                                                  .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
+                                                  .Enrich.FromLogContext()
+                                                  .WriteTo.Console()
+                                                  .WriteTo.Graylog(new GraylogSinkOptions()
+                                                  {
+                                                      Facility = "project-ivy-imdb-ratings",
+                                                      HostnameOrAddress = "10.0.1.24",
+                                                      Port = 12201,
+                                                      TransportType = TransportType.Tcp
+                                                  })
+                                                  .CreateLogger();
+            _logger = Log.Logger;
+
+            _logger.Information("Application started");
 
             try
             {
                 string connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING");
 
                 var users = (await DbHandler.GetImdbUsers(connectionString)).ToList();
-                LogInfo($"Found {users.Count} users with an Imdb account");
+                _logger.Information("Found {UserCount} users with an Imdb account", users.Count);
 
                 foreach (var user in users)
                 {
-                    LogInfo($"Processing movies for userId: {user.userId}");
+                    _logger.Information("Processing movies for userId: {UserId}", user.userId);
 
                     var existingIds = await DbHandler.GetMovieIds(connectionString, user.userId);
                     var imdbCookies = await DbHandler.GetImdbUserSecrets(connectionString, user.userId);
 
                     if (imdbCookies.Count() == 0)
                     {
-                        LogInfo($"User {user.userId} does not have imdb cookies");
+                        _logger.Information("User {UserId} does not have imdb cookies", user.userId);
                         continue;
                     }
 
@@ -52,28 +70,16 @@ namespace ProjectIvy.Imdb.Ratings
                     {
                         newMovie.UserId = user.userId;
                         await DbHandler.InsertMovie(connectionString, newMovie);
-                        LogInfo($"Movie: {newMovie.Title}, User: {newMovie.UserId}");
+                        _logger.Information("Movie {Title} added for userId: {UserId}", newMovie.Title, newMovie.UserId);
                     }
                 }
             }
             catch (Exception e)
             {
-                LogError(e.Message);
+                _logger.Error(e.Message);
             }
 
-            LogInfo("Application ended");
-        }
-
-        public static void LogInfo(string message)
-        {
-            _logger.Info(message);
-            Console.WriteLine(message);
-        }
-
-        public static void LogError(string message)
-        {
-            _logger.Error(message);
-            Console.WriteLine(message);
+            _logger.Information("Application ended");
         }
     }
 }
