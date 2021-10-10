@@ -27,8 +27,8 @@ namespace ProjectIvy.Imdb.Ratings
                                                   {
                                                       Facility = "project-ivy-imdb-ratings",
                                                       HostnameOrAddress = "10.0.1.24",
-                                                      Port = 12201,
-                                                      TransportType = TransportType.Tcp
+                                                      Port = 12202,
+                                                      TransportType = TransportType.Udp
                                                   })
                                                   .CreateLogger();
             _logger = Log.Logger;
