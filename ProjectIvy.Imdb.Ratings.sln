@@ -5,6 +5,13 @@ VisualStudioVersion = 15.0.27004.2010
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectIvy.Imdb.Ratings", "src\ProjectIvy.Imdb.Ratings\ProjectIvy.Imdb.Ratings.csproj", "{4C0D5609-72E6-4055-B582-2134417489F5}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{DCAAF2CE-0494-4E8C-A570-8E1DD34DE6DC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "deploy", "deploy", "{AC8C6EC9-41F4-4A3B-B438-A6E17BF8AE23}"
+	ProjectSection(SolutionItems) = preProject
+		Dockerfile = Dockerfile
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,5 +28,8 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2C5E7F94-D414-4EC8-9D3B-2054BC67FC8F}
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{4C0D5609-72E6-4055-B582-2134417489F5} = {DCAAF2CE-0494-4E8C-A570-8E1DD34DE6DC}
 	EndGlobalSection
 EndGlobal

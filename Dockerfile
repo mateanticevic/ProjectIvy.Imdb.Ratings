@@ -1,9 +1,10 @@
 FROM mcr.microsoft.com/dotnet/runtime:5.0-buster-slim AS base
 WORKDIR /app
 
-FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:5.0-focal  AS build
 WORKDIR /src
 COPY . .
+WORKDIR "/src/src/ProjectIvy.Imdb.Ratings"
 RUN dotnet build "ProjectIvy.Imdb.Ratings.csproj" -c Release -o /app/build
 
 FROM build AS publish
