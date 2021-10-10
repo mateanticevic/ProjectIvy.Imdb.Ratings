@@ -1,8 +1,8 @@
-﻿using Dapper;
-using ProjectIvy.Imdb.Ratings.Models;
-using System.Collections.Generic;
-using System.Data.SqlClient;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Dapper;
+using Microsoft.Data.SqlClient;
+using ProjectIvy.Imdb.Ratings.Models;
 
 namespace ProjectIvy.Imdb.Ratings
 {

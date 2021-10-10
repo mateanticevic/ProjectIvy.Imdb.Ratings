@@ -17,14 +17,16 @@
 
   <ItemGroup>
     <None Remove="appsettings.init.json" />
+    <None Remove="Microsoft.Data.SqlClient" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Dapper" Version="1.50.4" />
-    <PackageReference Include="TinyCsvParser" Version="2.0.0" />
+    <PackageReference Include="Dapper" Version="2.0.90" />
+    <PackageReference Include="TinyCsvParser" Version="2.6.1" />
     <PackageReference Include="Serilog.Sinks.Graylog" Version="2.2.2" />
     <PackageReference Include="Serilog" Version="2.10.0" />
-    <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="4.0.0" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="3.0.1" />
   </ItemGroup>
 
 </Project>
