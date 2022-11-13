@@ -1,7 +1,7 @@
 FROM mcr.microsoft.com/dotnet/runtime:7.0-bullseye-slim AS base
 WORKDIR /app
 
-FROM mcr.microsoft.com/dotnet/sdk:7.0-jammy  AS build
+FROM mcr.microsoft.com/dotnet/sdk:7.0  AS build
 WORKDIR /src
 COPY . .
 WORKDIR "/src/src/ProjectIvy.Imdb.Ratings"
