@@ -24,8 +24,11 @@ pipeline {
                    }
 
                    currentBuild.displayName = version
-
-                   def image = docker.build("mateanticevic/project-ivy-imdb-ratings", "--build-arg version=${version} .")
+                   def image
+                   
+                   docker.withRegistry('https://docker.io', 'docker-token') {
+                    image = docker.build("mateanticevic/project-ivy-imdb-ratings", "--build-arg version=${version} .")
+                   }
 
                    if (version == semver) {
                        image.push(version)
