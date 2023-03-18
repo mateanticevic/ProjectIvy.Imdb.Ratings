@@ -10,6 +10,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "deploy", "deploy", "{AC8C6EC9-41F4-4A3B-B438-A6E17BF8AE23}"
 	ProjectSection(SolutionItems) = preProject
 		Dockerfile = Dockerfile
+		Jenkinsfile = Jenkinsfile
 	EndProjectSection
 EndProject
 Global
